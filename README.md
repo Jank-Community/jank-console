@@ -242,29 +242,5 @@ npm run build
 - [x] 自定义设置（国际化、深色模式）
 - [x] 智能监控
 
-## 参与开发
-1. 创建一个本地分支
-    ```git
-   git checkout -b my-new-branch
-    ```
-2. 提交你的修改
-    ```shell
-    git commit -a -m 'Description of the changes'
-    ```
-3. 推送你的分支到远程仓库
-    ```shell
-    git push origin my-new-branch
-    ```
-4. 去到远程仓库发起合并请求
-
-# 📬 联系方式
-
-你可以通过这些方式跟我联系：
-
-- Email: cutesimba@163.com
 
 感谢你在我的互联网角落停留片刻！ 💫
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=pipijoe/xryder-web&type=Date)](https://star-history.com/#pipijoe/xryder-web&Date)
