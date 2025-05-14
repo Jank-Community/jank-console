@@ -5,6 +5,21 @@
 演示系统地址：[X.Ryder](https://xryder.cn)  
 账号：admin  
 密码：admin123
+
+## 开发要求
+
+git clone 之后，请将项目切换到dev分支
+或者直接clone   dev分支
+
+上传提交代码一定要记得切换到dev分支
+
+每次开发记得先拉后提交
+
+所有开发请勿在main上进行，谢谢
+
+
+
+
 ## 项目目录
 ```
 |-- undefined
