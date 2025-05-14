@@ -6,7 +6,7 @@
 账号：admin  
 密码：admin123
 ## 项目目录
-
+```
 |-- undefined
     |-- .gitignore
     |-- .prettierignore
@@ -202,7 +202,7 @@
         |   |-- visitorStore.tsx
         |-- utils
             |-- index.js
-
+```
 
 
 ## 使用的组件
