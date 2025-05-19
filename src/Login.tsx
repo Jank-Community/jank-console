@@ -18,7 +18,7 @@ import { encryptPassword, logoImg } from '@/utils'
 function Login() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const { login, isLoading, getPublicKey, publicKey } = useAuthStore()
+  const { login, isLoading } = useAuthStore()
   // 使用 useState 管理密码输入框的类型
   const [showPassword, setShowPassword] = useState(false)
 
@@ -27,16 +27,11 @@ function Login() {
     setShowPassword((prevState) => !prevState)
   }
   const navigate = useNavigate() // Hook for navigation
-  useEffect(() => {
-    getPublicKey()
-  }, [])
   const handleLogin = () => {
     if (username.trim().length == 0 || password.trim().length == 0) {
       return
     }
-    const encryptedPassword = encodeURIComponent(
-      encryptPassword(password, publicKey)
-    )
+    const encryptedPassword = encodeURIComponent(encryptPassword(password))
     login(username, encryptedPassword).then((res: any) => {
       if (res.code == 401) {
         toast.error('登录失败！', {
