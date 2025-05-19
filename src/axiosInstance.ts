@@ -17,8 +17,7 @@ let isRefreshToken = false
 const whiteList: string[] = ['/api/v1/token', '/login', '/v1/publicKey']
 // 所有通过api发送的请求，都会加上/api的前缀
 const api = axios.create({
-  //INFO: 暂时使用此接口
-  baseURL: 'https://www.jank.org.cn/api/v1',
+  baseURL: '/api',
 })
 
 // request拦截器
