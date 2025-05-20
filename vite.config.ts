@@ -27,7 +27,6 @@ export default defineConfig({
   server: {
     proxy: {
       // '/api/login': 'http://8.130.108.74:9010/api/v1',
-      //INFO: 暂时使用此接口
       '/api': {
         target: 'http://8.130.108.74:9010/api/v1',
         changeOrigin: true,

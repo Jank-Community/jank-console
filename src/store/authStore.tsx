@@ -1,8 +1,7 @@
+import { AxiosError, AxiosResponse } from 'axios'
 import { create } from 'zustand'
 
 // 引入 Axios 实例
-import { parseQuery } from '@/utils'
-
 import api from '../axiosInstance'
 
 interface authStore {
@@ -12,7 +11,7 @@ interface authStore {
   refreshToken: string
   isLoading: boolean
   error: string | null
-  login: (username: string, password: string) => Promise<any>
+  login: (email: string, password: string, vercode: string) => Promise<any>
   logout: () => void
 }
 
@@ -23,16 +22,20 @@ export const useAuthStore = create<authStore>((set) => ({
   refreshToken: '',
   isLoading: false,
   error: null,
-  login: async (username: string, password: string) => {
+  login: async (email: string, password: string, vercode: string) => {
     set({ isLoading: true, error: null })
     try {
-      const data: any = await api.post('/account/loginAccount')
-      if (data.code == 200) {
+      const res: AxiosResponse<
+        SuccessResponse<{ access_token: string; refresh_token: string }>
+      > = await api.post('/account/loginAccount', {
+        email: email,
+        img_verification_code: vercode,
+        password: password,
+      })
+      if (res.status == 200) {
         set({
-          name: data.data.nickname,
-          permissions: data.data.permissions,
-          token: data.data.token,
-          refreshToken: data.data.refreshToken,
+          token: res.data.data.access_token,
+          refreshToken: res.data.data.refresh_token,
           isLoading: false,
         })
       } else {
@@ -40,12 +43,20 @@ export const useAuthStore = create<authStore>((set) => ({
           isLoading: false,
         })
       }
-      return data
-    } catch (error: any) {
-      set({
-        error: error.response?.data?.msg || 'Login failed',
-        isLoading: false,
-      })
+      return res
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        set({
+          error: (error as AxiosError<ErrorResponse>).response?.data.msg,
+          isLoading: false,
+        })
+      } else {
+        set({
+          error: '登录失败',
+          isLoading: false,
+        })
+      }
+      return error
     }
   },
   logout: () => {

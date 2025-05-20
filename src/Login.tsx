@@ -31,7 +31,7 @@ function Login() {
     if (username.trim().length == 0 || password.trim().length == 0) {
       return
     }
-    const encryptedPassword = encodeURIComponent(encryptPassword(password))
+    const encryptedPassword = encryptPassword(password)
     login(username, encryptedPassword).then((res: any) => {
       if (res.code == 401) {
         toast.error('登录失败！', {

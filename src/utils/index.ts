@@ -15,6 +15,9 @@ export const agentImg = agent
 export const encryptPassword = (password: string) => {
   const encrypt = new JSEncrypt()
   const encryptedPassword = encrypt.encrypt(password)
+  if (!encryptedPassword) {
+    return ''
+  }
   return encryptedPassword
 }
 
