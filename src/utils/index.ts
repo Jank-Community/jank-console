@@ -12,14 +12,18 @@ export const fileImg = file
 export const imageImg = image
 export const agentImg = agent
 
-export const encryptPassword = (password) => {
+export const encryptPassword = (password: string) => {
   const encrypt = new JSEncrypt()
   const encryptedPassword = encrypt.encrypt(password)
   return encryptedPassword
 }
 
 // 递归函数查找路径
-export const findDepartmentPathById = (node, targetId, path = []) => {
+export const findDepartmentPathById = (
+  node: any,
+  targetId: number,
+  path: string[] = []
+): string[] | null => {
   if (node) {
     // 当前节点的 id 匹配，返回路径
     if (node.id === targetId) {
@@ -44,7 +48,7 @@ export const findDepartmentPathById = (node, targetId, path = []) => {
 }
 
 // 处理路径显示（超过 4 层用 ... 表示）
-export const formatPath = (path) => {
+export const formatPath = (path: string[] | null) => {
   if (path) {
     if (path.length >= 4) {
       // 如果层级大于等于 4 层，保留第一层、倒数第二层和最后一层
@@ -57,7 +61,11 @@ export const formatPath = (path) => {
 }
 
 // 查询部门父id数组，输出示例: [1, 4, 25]
-export const findParentIds = (node, targetId, path = []) => {
+export const findParentIds = (
+  node: any,
+  targetId: number,
+  path: string[] = []
+): string[] | null => {
   if (node.id === targetId) {
     return path // 找到目标ID，返回路径
   }
@@ -75,7 +83,7 @@ export const findParentIds = (node, targetId, path = []) => {
 }
 
 // 生成随机字符串的函数
-export const generateRandomString = (length) => {
+export const generateRandomString = (length: number) => {
   const characters =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   let result = ''
@@ -87,7 +95,7 @@ export const generateRandomString = (length) => {
 }
 
 // 拼接请求查询语句
-export const parseQuery = (obj) => {
+export const parseQuery = (obj: any) => {
   let str = ''
   for (let key in obj) {
     const value =
