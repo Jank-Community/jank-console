@@ -153,7 +153,12 @@ api.interceptors.response.use(
   (error: AxiosError<ErrorResponse>) => {
     // HTTP 错误处理
     const setError = useErrorStore.getState().setError
-    setError(error.response?.data.msg || '网络错误')
+    // if (error.response?.data.data == null) {
+    // FIX: 因后端返回的msg不够详尽，前端需要使用zod先做验证
+    setError(error.response!.data.msg)
+    // } else {
+    // setError(error.response!.data.data)
+    // }
     return Promise.reject(error)
   }
 )

@@ -98,6 +98,7 @@ export const generateRandomString = (length: number) => {
 }
 
 // 拼接请求查询语句
+// 参数格式:{"aaa":"sss"}
 export const parseQuery = (obj: any) => {
   let str = ''
   for (let key in obj) {

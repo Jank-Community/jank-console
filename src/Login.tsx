@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import { useNavigate } from 'react-router-dom'
 
 import { Eye, EyeOff } from 'lucide-react'
-import { toast } from 'sonner'
 
 import BoxReveal from '@/components/magicui/box-reveal'
 import DotPattern from '@/components/magicui/dot-pattern'
@@ -13,12 +12,16 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/authStore'
-import { encryptPassword, logoImg } from '@/utils'
+import { logoImg, parseQuery } from '@/utils'
+
+import api from './axiosInstance'
 
 function Login() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const { login, isLoading } = useAuthStore()
+  const [verifyCode, setVerifyCode] = useState('')
+  const [verifyCodeImg, setVerifyCodeImg] = useState('')
+  const authStore = useAuthStore()
   // 使用 useState 管理密码输入框的类型
   const [showPassword, setShowPassword] = useState(false)
 
@@ -27,33 +30,37 @@ function Login() {
     setShowPassword((prevState) => !prevState)
   }
   const navigate = useNavigate() // Hook for navigation
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (username.trim().length == 0 || password.trim().length == 0) {
       return
     }
-    const encryptedPassword = encryptPassword(password)
-    login(username, encryptedPassword).then((res: any) => {
-      if (res.code == 401) {
-        toast.error('登录失败！', {
-          description: res.data,
-        })
-      } else if (res.code == 200) {
-        navigate('/')
-        localStorage.setItem('token', res.data.token)
-        localStorage.setItem('refreshToken', res.data.refreshToken)
-      }
-    })
+    const loginsuccess = await authStore.login(username, password, verifyCode)
+    console.log(loginsuccess)
+    if (loginsuccess) {
+      navigate('/')
+      localStorage.setItem('token', authStore.token!)
+      localStorage.setItem('refreshToken', authStore.refreshToken)
+    }
   }
   const handleSubmit = async () => {
     handleLogin()
   }
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: any) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleLogin()
     }
   }
+
+  //TODO: 目前需要先手动获取，后面想办法页面自动获取并携带登录信息
+  const sendImgVerificationCode = async () => {
+    const res = await api.get(
+      '/verification/sendImgVerificationCode?' + parseQuery({ email: username })
+    )
+    setVerifyCodeImg(res.data.imgBase64)
+  }
+
   const currentYear = new Date().getFullYear()
 
   return (
@@ -192,17 +199,41 @@ function Login() {
                     )}
                   </button>
                 </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="verifyCode">验证码</Label>
+                  <div className="flex gap-4">
+                    <Input
+                      type="text"
+                      placeholder="输入图形验证码..."
+                      value={verifyCode}
+                      required
+                      onChange={(e) => setVerifyCode(e.target.value)}
+                    />
+                    <button
+                      type="submit"
+                      className="w-52 bg-transparent"
+                      onClick={sendImgVerificationCode}
+                    >
+                      {verifyCodeImg == '' ? (
+                        <span className="text-white">获取验证码</span>
+                      ) : (
+                        <img src={verifyCodeImg} />
+                      )}
+                    </button>
+                  </div>
+                </div>
                 <Button
                   type="submit"
-                  className="w-full"
                   onClick={handleSubmit}
-                  disabled={isLoading}
+                  disabled={authStore.isLoading}
                 >
-                  {isLoading ? '正在登录...' : '登录'}
+                  {authStore.isLoading ? '正在登录...' : '登录'}
                 </Button>
-                <Button variant="outline" className="w-full">
-                  使用第三方账号登录
-                </Button>
+
+                {/* TODO: 第三方登录暂未实现 */}
+                {/* <Button variant="outline" className="w-full"> */}
+                {/*   使用第三方账号登录 */}
+                {/* </Button> */}
               </div>
             </CardContent>
           </Card>

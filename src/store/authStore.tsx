@@ -11,7 +11,7 @@ interface authStore {
   refreshToken: string
   isLoading: boolean
   error: string | null
-  login: (email: string, password: string, vercode: string) => Promise<any>
+  login: (email: string, password: string, vercode: string) => Promise<boolean>
   logout: () => void
 }
 
@@ -32,31 +32,20 @@ export const useAuthStore = create<authStore>((set) => ({
         img_verification_code: vercode,
         password: password,
       })
-      if (res.status == 200) {
-        set({
-          token: res.data.data.access_token,
-          refreshToken: res.data.data.refresh_token,
-          isLoading: false,
-        })
-      } else {
-        set({
-          isLoading: false,
-        })
-      }
-      return res
+      set({
+        token: res.data.data.access_token,
+        refreshToken: res.data.data.refresh_token,
+        isLoading: false,
+      })
+      return true
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         set({
-          error: (error as AxiosError<ErrorResponse>).response?.data.msg,
-          isLoading: false,
-        })
-      } else {
-        set({
-          error: '登录失败',
+          error: (error as AxiosError<ErrorResponse>).response!.data.msg,
           isLoading: false,
         })
       }
-      return error
+      return false
     }
   },
   logout: () => {
