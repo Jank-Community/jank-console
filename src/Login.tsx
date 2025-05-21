@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+
+import React, { useState } from 'react'
 
 import { useNavigate } from 'react-router-dom'
 
 import { Eye, EyeOff } from 'lucide-react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import BoxReveal from '@/components/magicui/box-reveal'
@@ -16,13 +19,21 @@ import { useAuthStore } from '@/store/authStore'
 import { logoImg, parseQuery } from '@/utils'
 
 import api from './axiosInstance'
+import { LoginFormData, loginFormSchema } from './utils/formValidation'
 
 function Login() {
+  //使用zod做表单验证
+  const formValidation = useForm<LoginFormData>({
+    resolver: zodResolver(loginFormSchema),
+    mode: 'onChange',
+  })
+
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [verifyCode, setVerifyCode] = useState('')
   const [verifyCodeImg, setVerifyCodeImg] = useState('')
   const authStore = useAuthStore()
+
   // 使用 useState 管理密码输入框的类型
   const [showPassword, setShowPassword] = useState(false)
 
@@ -77,7 +88,6 @@ function Login() {
       setVerifyCodeImg(res.data.imgBase64)
     } catch (error) {
       toast.error('获取验证码失败，请检查邮箱地址或网络。')
-      console.error('获取验证码失败:', error)
       setVerifyCodeImg('') // 清空验证码图片
     }
   }
@@ -191,24 +201,37 @@ function Login() {
                 <div className="grid gap-2">
                   <Label htmlFor="email">账号</Label>
                   <Input
+                    {...formValidation.register('email')} //注册验证类型为Email
                     type="text"
                     placeholder="输入账号..."
                     value={username}
                     required
                     onChange={(e) => setUsername(e.target.value)}
-                    onBlur={sendImgVerificationCode}
+                    // onBlur={sendImgVerificationCode}
                   />
+                  {formValidation.formState.errors.email && (
+                    <span className="text-red-400 text-sm">
+                      {formValidation.formState.errors.email.message}
+                    </span>
+                  )}
                 </div>
                 <div className="grid gap-2 relative">
                   <Label htmlFor="password">密码</Label>
                   <Input
+                    {...formValidation.register('password')}
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     onKeyDown={handleKeyDown}
                     placeholder="输入密码..."
                     required
                     onChange={(e) => setPassword(e.target.value)}
+                    onFocus={sendImgVerificationCode}
                   />
+                  {formValidation.formState.errors.password && (
+                    <span className="text-red-400 text-sm">
+                      {formValidation.formState.errors.password.message}
+                    </span>
+                  )}
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
@@ -242,7 +265,7 @@ function Login() {
                 </div>
                 <Button
                   type="submit"
-                  onClick={handleSubmit}
+                  onClick={formValidation.handleSubmit(handleSubmit)}
                   disabled={authStore.isLoading}
                 >
                   {authStore.isLoading ? '正在登录...' : '登录'}

@@ -154,7 +154,6 @@ api.interceptors.response.use(
     // HTTP 错误处理
     const setError = useErrorStore.getState().setError
     // if (error.response?.data.data == null) {
-    // FIX: 因后端返回的msg不够详尽，前端需要使用zod先做验证
     setError(error.response!.data.msg)
     // } else {
     // setError(error.response!.data.data)
