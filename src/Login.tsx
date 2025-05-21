@@ -216,7 +216,7 @@ function Login() {
                     onChange={(e) => setUsername(e.target.value)}
                   />
                 </div>
-                <div className="grid gap-2 relative flex">
+                <div className="grid gap-2 relative">
                   <Label htmlFor="password">密码</Label>
                   <Input
                     id="password"
