@@ -11,7 +11,7 @@ interface authStore {
   refreshToken: string
   isLoading: boolean
   error: string | null
-  login: (email: string, password: string, vercode: string) => Promise<boolean>
+  login: (email: string, password: string, vercode: string) => Promise<boolean> // 修改返回类型为 Promise<boolean>
   logout: () => void
 }
 
@@ -24,19 +24,38 @@ export const useAuthStore = create<authStore>((set) => ({
   error: null,
   login: async (email: string, password: string, vercode: string) => {
     set({ isLoading: true, error: null })
+    console.log('走到这里了')
+    console.log('email', email)
+    console.log('name', password)
+    console.log('token', vercode)
+
     try {
-      const res: AxiosResponse<
-        SuccessResponse<{ access_token: string; refresh_token: string }>
-      > = await api.post('/account/loginAccount', {
+      const res: AxiosResponse<{
+        access_token: string
+        refresh_token: string
+      }> = await api.post('/account/loginAccount', {
         email: email,
         img_verification_code: vercode,
         password: password,
       })
+
+      console.log('走到这里了2')
+      console.log(res, 'res')
+      console.log(res.data, 'res.data')
+      const { access_token, refresh_token } = res.data
+
       set({
-        token: res.data.data.access_token,
-        refreshToken: res.data.data.refresh_token,
+        token: access_token,
+        refreshToken: refresh_token,
         isLoading: false,
       })
+
+      // 在这里直接保存到 localStorage
+      localStorage.setItem('token', access_token)
+      localStorage.setItem('refreshToken', refresh_token)
+      console.log('结束')
+      console.log('结束')
+
       return true
     } catch (error: unknown) {
       if (error instanceof AxiosError) {

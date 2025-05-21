@@ -24,12 +24,19 @@ export default defineConfig({
       ],
     },
   },
+  //跨域
   server: {
+    host: '0.0.0.0', // 服务器主机名，如果允许外部访问，可设置为"0.0.0.0"
+    port: 5173,
+    open: true,
+    cors: true,
+    // https: false,
+    // 代理跨域（mock 不需要配置，这里只是个事列）http://43.200.5.142:80
     proxy: {
-      // '/api/login': 'http://8.130.108.74:9010/api/v1',
       '/api': {
         target: 'http://8.130.108.74:9010/api/v1',
         changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },

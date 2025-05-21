@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { useNavigate } from 'react-router-dom'
 
 import { Eye, EyeOff } from 'lucide-react'
+import { toast } from 'sonner'
 
 import BoxReveal from '@/components/magicui/box-reveal'
 import DotPattern from '@/components/magicui/dot-pattern'
@@ -31,35 +32,73 @@ function Login() {
   }
   const navigate = useNavigate() // Hook for navigation
   const handleLogin = async () => {
-    if (username.trim().length == 0 || password.trim().length == 0) {
+    if (username.trim().length === 0 || password.trim().length === 0) {
+      toast.error('用户名或密码不能为空！') // 添加提示
       return
     }
     const loginsuccess = await authStore.login(username, password, verifyCode)
-    console.log(loginsuccess)
+    console.log(loginsuccess, 'loginsuccess')
+    console.log(authStore.token, 'authStore.token (在Login.tsx中)')
+    console.log(
+      authStore.refreshToken,
+      'authStore.refreshToken (在Login.tsx中)'
+    )
     if (loginsuccess) {
+      toast.success('登录成功！') // 添加成功提示
       navigate('/')
-      localStorage.setItem('token', authStore.token!)
-      localStorage.setItem('refreshToken', authStore.refreshToken)
+    } else {
+      toast.error(authStore.error || '登录失败，请检查用户名、密码或验证码。') // 显示具体错误信息
+      // 登录失败时重新获取验证码，确保用户能看到新的验证码
+      sendImgVerificationCode()
     }
   }
   const handleSubmit = async () => {
     handleLogin()
   }
 
-  const handleKeyDown = (e: any) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleLogin()
     }
   }
 
-  //TODO: 目前需要先手动获取，后面想办法页面自动获取并携带登录信息
   const sendImgVerificationCode = async () => {
-    const res = await api.get(
-      '/verification/sendImgVerificationCode?' + parseQuery({ email: username })
-    )
-    setVerifyCodeImg(res.data.imgBase64)
+    // 只有当用户名有值时才发送请求
+    if (username.trim().length === 0) {
+      setVerifyCodeImg('') // 清空验证码图片
+      return
+    }
+    try {
+      const res = await api.get(
+        '/verification/sendImgVerificationCode?' +
+          parseQuery({ email: username })
+      )
+      setVerifyCodeImg(res.data.imgBase64)
+    } catch (error) {
+      toast.error('获取验证码失败，请检查邮箱地址或网络。')
+      console.error('获取验证码失败:', error)
+      setVerifyCodeImg('') // 清空验证码图片
+    }
   }
+
+  // 使用 useEffect 进行去抖动处理
+  useEffect(() => {
+    // 如果 username 为空，则不需要去抖动，直接清空图片
+    if (username.trim().length === 0) {
+      setVerifyCodeImg('')
+      return
+    }
+
+    const handler = setTimeout(() => {
+      sendImgVerificationCode()
+    }, 500) // 500毫秒的去抖动延迟
+
+    // 清理函数，在组件卸载或 username 变化时清除上一个定时器
+    return () => {
+      clearTimeout(handler)
+    }
+  }, [username]) // 依赖 username
 
   const currentYear = new Date().getFullYear()
 
@@ -201,7 +240,7 @@ function Login() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="verifyCode">验证码</Label>
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 justify-center items-center">
                     <Input
                       type="text"
                       placeholder="输入图形验证码..."
@@ -209,17 +248,13 @@ function Login() {
                       required
                       onChange={(e) => setVerifyCode(e.target.value)}
                     />
-                    <button
-                      type="submit"
-                      className="w-52 bg-transparent"
-                      onClick={sendImgVerificationCode}
-                    >
-                      {verifyCodeImg == '' ? (
-                        <span className="text-white">获取验证码</span>
+                    <div className="w-52 bg-transparent">
+                      {verifyCodeImg === '' ? (
+                        <span className="text-white">自动获取验证码</span>
                       ) : (
-                        <img src={verifyCodeImg} />
+                        <img src={verifyCodeImg} alt="验证码" />
                       )}
-                    </button>
+                    </div>
                   </div>
                 </div>
                 <Button
@@ -232,7 +267,7 @@ function Login() {
 
                 {/* TODO: 第三方登录暂未实现 */}
                 {/* <Button variant="outline" className="w-full"> */}
-                {/*   使用第三方账号登录 */}
+                {/* 使用第三方账号登录 */}
                 {/* </Button> */}
               </div>
             </CardContent>
