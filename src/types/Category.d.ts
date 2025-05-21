@@ -8,23 +8,25 @@ export type CategoryItem = {
   children: CategoryItem[] | null | number
 }
 
+export const baseURL = 'http://8.130.108.74:9010/api/v1'
+
 // =====================
 // getOneCategory (GET)
-export const CATEGORY_GET_ONE_PATH = (id: number) => `/api/v1/category/getOneCategory?id=${id}`
+export const CATEGORY_GET_ONE_PATH = (id: number) => `/category/getOneCategory?id=${id}`
 export type GetOneCategoryRequest = { id: number }
 export type GetOneCategorySuccess = SuccessResponse<CategoryItem>
 export type GetOneCategoryError = ErrorResponse<any>
 
 // =====================
 // getCategoryTree (GET)
-export const CATEGORY_GET_TREE_PATH = '/api/v1/category/getCategoryTree'
+export const CATEGORY_GET_TREE_PATH = '/category/getCategoryTree'
 export type GetCategoryTreeRequest = void // No params
 export type GetCategoryTreeSuccess = SuccessResponse<CategoryItem[]>
 export type GetCategoryTreeError = ErrorResponse<any>
 
 // =====================
 // createOneCategory (POST)
-export const CATEGORY_CREATE_ONE_PATH = '/api/v1/category/createOneCategory'
+export const CATEGORY_CREATE_ONE_PATH = '/category/createOneCategory'
 export type CreateOneCategoryRequest = {
   name: string
   description: string
@@ -35,7 +37,7 @@ export type CreateOneCategoryError = ErrorResponse<any>
 
 // =====================
 // updateOneCategory (POST)
-export const CATEGORY_UPDATE_ONE_PATH = '/api/v1/category/updateOneCategory'
+export const CATEGORY_UPDATE_ONE_PATH = '/category/updateOneCategory'
 export type UpdateOneCategoryRequest = {
   id: number
   name: string
@@ -47,14 +49,14 @@ export type UpdateOneCategoryError = ErrorResponse<any>
 
 // =====================
 // deleteOneCategory (POST)
-export const CATEGORY_DELETE_ONE_PATH = '/api/v1/category/deleteOneCategory'
+export const CATEGORY_DELETE_ONE_PATH = '/category/deleteOneCategory'
 export type DeleteOneCategoryRequest = { id: number }
 export type DeleteOneCategorySuccess = SuccessResponse<CategoryItem[]>
 export type DeleteOneCategoryError = ErrorResponse<any>
 
 // =====================
 // getCategoryChildrenTree (GET)
-export const CATEGORY_GET_CHILDREN_TREE_PATH = (id: number) => `/api/v1/category/getCategoryChildrenTree?id=${id}`
+export const CATEGORY_GET_CHILDREN_TREE_PATH = (id: number) => `/category/getCategoryChildrenTree?id=${id}`
 export type GetCategoryChildrenTreeRequest = { id: number }
 export type GetCategoryChildrenTreeSuccess = SuccessResponse<CategoryItem[]>
 export type GetCategoryChildrenTreeError = ErrorResponse<any> 
