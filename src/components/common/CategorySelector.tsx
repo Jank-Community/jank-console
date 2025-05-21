@@ -1,429 +1,534 @@
-import type { CategoryItem } from "@/types/Category"
-import { Button } from "@/components/ui/button"
+import { useState } from 'react'
+
+import { Button } from '@/components/ui/button'
+import type { CategoryItem } from '@/types/Category'
+
+import { getTheme } from '../theme-provider'
 
 const mockCategories: CategoryItem[] = [
   {
     id: 1,
-    name: "Electronics",
-    description: "Devices and gadgets",
+    name: 'Electronics',
+    description: 'Devices and gadgets',
     parent_id: 0,
-    path: "1",
+    path: '1',
     children: [
       {
         id: 2,
-        name: "Laptops",
-        description: "Portable computers",
+        name: 'Laptops',
+        description: 'Portable computers',
         parent_id: 1,
-        path: "1/2",
+        path: '1/2',
         children: null,
       },
       {
         id: 4,
-        name: "Smartphones",
-        description: "Mobile phones with advanced features",
+        name: 'Smartphones',
+        description: 'Mobile phones with advanced features',
         parent_id: 1,
-        path: "1/4",
+        path: '1/4',
         children: null,
       },
       {
         id: 5,
-        name: "Cameras",
-        description: "Digital and film cameras",
+        name: 'Cameras',
+        description: 'Digital and film cameras',
         parent_id: 1,
-        path: "1/5",
+        path: '1/5',
         children: null,
       },
     ],
   },
   {
     id: 3,
-    name: "Books",
-    description: "All kinds of books",
+    name: 'Books',
+    description: 'All kinds of books',
     parent_id: 0,
-    path: "3",
+    path: '3',
     children: [
       {
         id: 6,
-        name: "Fiction",
-        description: "Narrative literary works",
+        name: 'Fiction',
+        description: 'Narrative literary works',
         parent_id: 3,
-        path: "3/6",
+        path: '3/6',
         children: null,
       },
       {
         id: 7,
-        name: "Non-Fiction",
-        description: "Factual books",
+        name: 'Non-Fiction',
+        description: 'Factual books',
         parent_id: 3,
-        path: "3/7",
+        path: '3/7',
         children: null,
       },
       {
         id: 8,
-        name: "Science Fiction",
-        description: "Speculative fiction",
+        name: 'Science Fiction',
+        description: 'Speculative fiction',
         parent_id: 3,
-        path: "3/8",
+        path: '3/8',
         children: null,
       },
     ],
   },
   {
     id: 9,
-    name: "Clothing",
-    description: "Apparel and accessories",
+    name: 'Clothing',
+    description: 'Apparel and accessories',
     parent_id: 0,
-    path: "9",
+    path: '9',
     children: [
       {
         id: 10,
         name: "Men's",
-        description: "Clothing for men",
+        description: 'Clothing for men',
         parent_id: 9,
-        path: "9/10",
+        path: '9/10',
         children: null,
       },
       {
         id: 11,
         name: "Women's",
-        description: "Clothing for women",
+        description: 'Clothing for women',
         parent_id: 9,
-        path: "9/11",
+        path: '9/11',
         children: null,
       },
       {
         id: 12,
         name: "Kid's",
-        description: "Clothing for children",
+        description: 'Clothing for children',
         parent_id: 9,
-        path: "9/12",
+        path: '9/12',
         children: null,
       },
     ],
   },
   {
     id: 13,
-    name: "Home & Garden",
-    description: "Products for home and garden",
+    name: 'Home & Garden',
+    description: 'Products for home and garden',
     parent_id: 0,
-    path: "13",
+    path: '13',
     children: [
       {
         id: 14,
-        name: "Furniture",
-        description: "Tables, chairs, beds, etc.",
+        name: 'Furniture',
+        description: 'Tables, chairs, beds, etc.',
         parent_id: 13,
-        path: "13/14",
+        path: '13/14',
         children: null,
       },
       {
         id: 15,
-        name: "Kitchenware",
-        description: "Utensils and appliances for kitchen",
+        name: 'Kitchenware',
+        description: 'Utensils and appliances for kitchen',
         parent_id: 13,
-        path: "13/15",
+        path: '13/15',
         children: null,
       },
       {
         id: 16,
-        name: "Gardening Tools",
-        description: "Tools for gardening",
+        name: 'Gardening Tools',
+        description: 'Tools for gardening',
         parent_id: 13,
-        path: "13/16",
+        path: '13/16',
         children: null,
       },
     ],
   },
   {
     id: 17,
-    name: "Sports & Outdoors",
-    description: "Equipment for sports and outdoor activities",
+    name: 'Sports & Outdoors',
+    description: 'Equipment for sports and outdoor activities',
     parent_id: 0,
-    path: "17",
+    path: '17',
     children: null,
   },
   {
     id: 18,
-    name: "Toys & Games",
-    description: "Playthings for all ages",
+    name: 'Toys & Games',
+    description: 'Playthings for all ages',
     parent_id: 0,
-    path: "18",
+    path: '18',
     children: null,
   },
   {
     id: 19,
-    name: "Health & Beauty",
-    description: "Personal care and beauty products",
+    name: 'Health & Beauty',
+    description: 'Personal care and beauty products',
     parent_id: 0,
-    path: "19",
+    path: '19',
     children: null,
   },
   {
     id: 20,
-    name: "Automotive",
-    description: "Parts and accessories for vehicles",
+    name: 'Automotive',
+    description: 'Parts and accessories for vehicles',
     parent_id: 0,
-    path: "20",
+    path: '20',
     children: null,
   },
   {
     id: 21,
-    name: "Music",
-    description: "Instruments, albums, and merchandise",
+    name: 'Music',
+    description: 'Instruments, albums, and merchandise',
     parent_id: 0,
-    path: "21",
+    path: '21',
     children: null,
   },
   {
     id: 22,
-    name: "Movies & TV",
-    description: "DVDs, Blu-rays, and streaming",
+    name: 'Movies & TV',
+    description: 'DVDs, Blu-rays, and streaming',
     parent_id: 0,
-    path: "22",
+    path: '22',
     children: null,
   },
   {
     id: 23,
-    name: "Software",
-    description: "Applications and operating systems",
+    name: 'Software',
+    description: 'Applications and operating systems',
     parent_id: 0,
-    path: "23",
+    path: '23',
     children: null,
   },
   {
     id: 24,
-    name: "Office Supplies",
-    description: "Stationery and office equipment",
+    name: 'Office Supplies',
+    description: 'Stationery and office equipment',
     parent_id: 0,
-    path: "24",
+    path: '24',
     children: null,
   },
   {
     id: 25,
-    name: "Pet Supplies",
-    description: "Food and accessories for pets",
+    name: 'Pet Supplies',
+    description: 'Food and accessories for pets',
     parent_id: 0,
-    path: "25",
+    path: '25',
     children: null,
   },
   {
     id: 26,
-    name: "Groceries",
-    description: "Food and household essentials",
+    name: 'Groceries',
+    description: 'Food and household essentials',
     parent_id: 0,
-    path: "26",
+    path: '26',
     children: null,
   },
   {
     id: 27,
-    name: "Craft Supplies",
-    description: "Materials for arts and crafts",
+    name: 'Craft Supplies',
+    description: 'Materials for arts and crafts',
     parent_id: 0,
-    path: "27",
+    path: '27',
     children: null,
   },
   {
     id: 28,
-    name: "Jewelry",
-    description: "Decorative items worn for personal adornment",
+    name: 'Jewelry',
+    description: 'Decorative items worn for personal adornment',
     parent_id: 0,
-    path: "28",
+    path: '28',
     children: null,
   },
   {
     id: 29,
-    name: "Collectibles",
-    description: "Items of interest to collectors",
+    name: 'Collectibles',
+    description: 'Items of interest to collectors',
     parent_id: 0,
-    path: "29",
+    path: '29',
     children: null,
   },
   {
     id: 30,
-    name: "Travel",
-    description: "Luggage and travel accessories",
+    name: 'Travel',
+    description: 'Luggage and travel accessories',
     parent_id: 0,
-    path: "30",
+    path: '30',
     children: null,
   },
   {
     id: 31,
-    name: "Industrial & Scientific",
-    description: "Equipment for industrial and scientific use",
+    name: 'Industrial & Scientific',
+    description: 'Equipment for industrial and scientific use',
     parent_id: 0,
-    path: "31",
+    path: '31',
     children: null,
   },
   {
     id: 32,
-    name: "Baby Products",
-    description: "Items for infants and toddlers",
+    name: 'Baby Products',
+    description: 'Items for infants and toddlers',
     parent_id: 0,
-    path: "32",
+    path: '32',
     children: null,
   },
   {
     id: 33,
-    name: "Luggage",
-    description: "Suitcases, bags, and travel gear",
+    name: 'Luggage',
+    description: 'Suitcases, bags, and travel gear',
     parent_id: 0,
-    path: "33",
+    path: '33',
     children: null,
   },
   {
     id: 34,
-    name: "Musical Instruments",
-    description: "Guitars, keyboards, drums, etc.",
+    name: 'Musical Instruments',
+    description: 'Guitars, keyboards, drums, etc.',
     parent_id: 0,
-    path: "34",
+    path: '34',
     children: null,
   },
   {
     id: 35,
-    name: "Watches",
-    description: "Timepieces for men and women",
+    name: 'Watches',
+    description: 'Timepieces for men and women',
     parent_id: 0,
-    path: "35",
+    path: '35',
     children: null,
   },
   {
     id: 36,
-    name: "Video Games",
-    description: "Consoles, games, and accessories",
+    name: 'Video Games',
+    description: 'Consoles, games, and accessories',
     parent_id: 0,
-    path: "36",
+    path: '36',
     children: null,
   },
   {
     id: 37,
-    name: "Art Supplies",
-    description: "Paints, brushes, canvases",
+    name: 'Art Supplies',
+    description: 'Paints, brushes, canvases',
     parent_id: 0,
-    path: "37",
+    path: '37',
     children: null,
   },
   {
     id: 38,
-    name: "Party Supplies",
-    description: "Decorations, tableware for parties",
+    name: 'Party Supplies',
+    description: 'Decorations, tableware for parties',
     parent_id: 0,
-    path: "38",
+    path: '38',
     children: null,
   },
   {
     id: 39,
-    name: "Tools & Home Improvement",
-    description: "Hand tools, power tools, building supplies",
+    name: 'Tools & Home Improvement',
+    description: 'Hand tools, power tools, building supplies',
     parent_id: 0,
-    path: "39",
+    path: '39',
     children: null,
   },
   {
     id: 40,
-    name: "Patio, Lawn & Garden",
-    description: "Outdoor furniture and garden care",
+    name: 'Patio, Lawn & Garden',
+    description: 'Outdoor furniture and garden care',
     parent_id: 0,
-    path: "40",
+    path: '40',
     children: null,
   },
   {
     id: 41,
-    name: "Appliances",
-    description: "Major and small home appliances",
+    name: 'Appliances',
+    description: 'Major and small home appliances',
     parent_id: 0,
-    path: "41",
+    path: '41',
     children: null,
   },
   {
     id: 42,
-    name: "Handmade Products",
-    description: "Artisan and handcrafted goods",
+    name: 'Handmade Products',
+    description: 'Artisan and handcrafted goods',
     parent_id: 0,
-    path: "42",
+    path: '42',
     children: null,
   },
   {
     id: 43,
-    name: "Lighting",
-    description: "Indoor and outdoor lighting fixtures",
+    name: 'Lighting',
+    description: 'Indoor and outdoor lighting fixtures',
     parent_id: 0,
-    path: "43",
+    path: '43',
     children: null,
   },
   {
     id: 44,
-    name: "Storage & Organization",
-    description: "Solutions for organizing spaces",
+    name: 'Storage & Organization',
+    description: 'Solutions for organizing spaces',
     parent_id: 0,
-    path: "44",
+    path: '44',
     children: null,
   },
   {
     id: 45,
-    name: "Safety & Security",
-    description: "Products for personal and home safety",
+    name: 'Safety & Security',
+    description: 'Products for personal and home safety',
     parent_id: 0,
-    path: "45",
+    path: '45',
     children: null,
   },
   {
     id: 46,
-    name: "Sustainable Products",
-    description: "Eco-friendly and sustainable items",
+    name: 'Sustainable Products',
+    description: 'Eco-friendly and sustainable items',
     parent_id: 0,
-    path: "46",
+    path: '46',
     children: null,
   },
   {
     id: 47,
-    name: "Fitness Equipment",
-    description: "Exercise machines and accessories",
+    name: 'Fitness Equipment',
+    description: 'Exercise machines and accessories',
     parent_id: 0,
-    path: "47",
+    path: '47',
     children: null,
   },
   {
     id: 48,
-    name: "Cycling",
-    description: "Bicycles and cycling gear",
+    name: 'Cycling',
+    description: 'Bicycles and cycling gear',
     parent_id: 0,
-    path: "48",
+    path: '48',
     children: null,
   },
   {
     id: 49,
-    name: "Camping & Hiking",
-    description: "Tents, backpacks, and outdoor gear",
+    name: 'Camping & Hiking',
+    description: 'Tents, backpacks, and outdoor gear',
     parent_id: 0,
-    path: "49",
+    path: '49',
     children: null,
   },
   {
     id: 50,
-    name: "Boating & Water Sports",
-    description: "Equipment for water-based activities",
+    name: 'Boating & Water Sports',
+    description: 'Equipment for water-based activities',
     parent_id: 0,
-    path: "50",
+    path: '50',
     children: null,
   },
 ]
 
+const getDisplayCategories = (categories: CategoryItem[]): CategoryItem[] => {
+  const flatCategories: CategoryItem[] = []
+  function flatten(item: CategoryItem) {
+    flatCategories.push(item)
+    if (item.children && Array.isArray(item.children)) {
+      item.children.forEach(flatten)
+    }
+  }
+  categories.forEach(flatten)
+  return flatCategories.slice(0, 50)
+}
+
 export function CategorySelector() {
-  const displayedCategories = mockCategories;
+  const currentTheme = getTheme()
+  const allDisplayCategories = getDisplayCategories(mockCategories)
+  const [collapsed, setCollapsed] = useState(true)
+  const [selectedCategoryName, setSelectedCategoryName] = useState<
+    string | null
+  >(allDisplayCategories.length > 0 ? allDisplayCategories[0].name : null)
+
+  const handleCategoryClick = (categoryName: string) => {
+    setSelectedCategoryName(categoryName)
+  }
+
+  const itemsToShowWhenCollapsed = 6
+  const collapsedViewCategories = allDisplayCategories.slice(
+    0,
+    itemsToShowWhenCollapsed
+  )
+  const expandedViewCategories = allDisplayCategories
+
+  const getMockCount = (categoryId: number) => {
+    let hash = 0
+    const str = String(categoryId + 'count')
+    for (let i = 0; i < str.length; i++) {
+      hash = (hash << 5) - hash + str.charCodeAt(i)
+      hash |= 0
+    }
+    return Math.abs(hash % 300) + 10
+  }
+
+  const isDark = currentTheme === 'dark'
+
+  const renderCategoryButtons = (categories: CategoryItem[]) => {
+    return categories.map((category) => {
+      const isHighlighted = category.name === selectedCategoryName
+      const mockCount = getMockCount(category.id)
+
+      return (
+        <Button
+          key={category.id}
+          onClick={() => handleCategoryClick(category.name)}
+          className={`
+            h-auto px-2.5 py-1 text-sm font-medium rounded-md flex items-center justify-center
+            transition-colors duration-150 ease-in-out
+            focus:outline-none focus:ring-2 focus:ring-offset-2
+            ${isDark ? 'focus:ring-offset-neutral-900' : 'focus:ring-offset-gray-100'}
+            ${
+              isHighlighted
+                ? 'bg-yellow-400 text-black hover:bg-yellow-500 focus:ring-yellow-400'
+                : isDark
+                  ? 'bg-neutral-700 text-white hover:bg-neutral-600'
+                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+            }
+          `}
+        >
+          <span className="mr-1.5"># {category.name}</span>
+          <span
+            className={`
+              ml-1 px-1.5 py-0.5 text-xs rounded-sm font-semibold
+              ${
+                isHighlighted
+                  ? 'bg-yellow-500 text-black'
+                  : isDark
+                    ? 'bg-neutral-600 text-white'
+                    : 'bg-gray-300 text-gray-700'
+              }
+            `}
+          >
+            {mockCount}
+          </span>
+        </Button>
+      )
+    })
+  }
 
   return (
-    <div className="p-4">
-      <div className="mb-4 text-lg font-semibold">分类</div>
-      <div className="flex flex-wrap gap-2 mb-4 w-1/2">
-        {displayedCategories.map((category) => (
-          <Button key={category.id} variant="outline" size="sm">
-            {category.name}
-          </Button>
-        ))}
+    <div
+      className="relative w-full"
+      onMouseEnter={() => setCollapsed(false)}
+      onMouseLeave={() => setCollapsed(true)}
+    >
+      <div
+        className={`
+          p-2 rounded-md w-full
+          ${isDark ? 'bg-neutral-900' : 'bg-gray-100'}
+          ${!collapsed ? 'invisible' : ''}
+        `}
+        aria-hidden={!collapsed}
+      >
+        <div className="flex flex-wrap gap-x-2 gap-y-3">
+          {renderCategoryButtons(collapsedViewCategories)}
+        </div>
       </div>
-      <Button variant="secondary" className="w-1/2">
-        查看全部
-      </Button>
+
+      {!collapsed && (
+        <div
+          className={`
+            absolute top-0 left-0 w-full p-2 rounded-md z-50 shadow-lg
+            ${isDark ? 'bg-neutral-900' : 'bg-gray-100'}
+          `}
+        >
+          <div className="flex flex-wrap gap-x-2 gap-y-3">
+            {renderCategoryButtons(expandedViewCategories)}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
