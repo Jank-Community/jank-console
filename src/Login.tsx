@@ -82,24 +82,6 @@ function Login() {
     }
   }
 
-  // 使用 useEffect 进行去抖动处理
-  useEffect(() => {
-    // 如果 username 为空，则不需要去抖动，直接清空图片
-    if (username.trim().length === 0) {
-      setVerifyCodeImg('')
-      return
-    }
-
-    const handler = setTimeout(() => {
-      sendImgVerificationCode()
-    }, 500) // 500毫秒的去抖动延迟
-
-    // 清理函数，在组件卸载或 username 变化时清除上一个定时器
-    return () => {
-      clearTimeout(handler)
-    }
-  }, [username]) // 依赖 username
-
   const currentYear = new Date().getFullYear()
 
   return (
@@ -214,6 +196,7 @@ function Login() {
                     value={username}
                     required
                     onChange={(e) => setUsername(e.target.value)}
+                    onBlur={sendImgVerificationCode}
                   />
                 </div>
                 <div className="grid gap-2 relative">
