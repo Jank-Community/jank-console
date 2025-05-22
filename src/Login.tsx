@@ -43,22 +43,11 @@ function Login() {
   }
   const navigate = useNavigate() // Hook for navigation
   const handleLogin = async () => {
-    if (username.trim().length === 0 || password.trim().length === 0) {
-      toast.error('用户名或密码不能为空！') // 添加提示
-      return
-    }
     const loginsuccess = await authStore.login(username, password, verifyCode)
-    console.log(loginsuccess, 'loginsuccess')
-    console.log(authStore.token, 'authStore.token (在Login.tsx中)')
-    console.log(
-      authStore.refreshToken,
-      'authStore.refreshToken (在Login.tsx中)'
-    )
     if (loginsuccess) {
       toast.success('登录成功！') // 添加成功提示
       navigate('/')
     } else {
-      toast.error(authStore.error || '登录失败，请检查用户名、密码或验证码。') // 显示具体错误信息
       // 登录失败时重新获取验证码，确保用户能看到新的验证码
       sendImgVerificationCode()
     }
@@ -221,7 +210,6 @@ function Login() {
                     {...formValidation.register('password')}
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    onKeyDown={handleKeyDown}
                     placeholder="输入密码..."
                     required
                     onChange={(e) => setPassword(e.target.value)}
@@ -252,6 +240,7 @@ function Login() {
                       placeholder="输入图形验证码..."
                       value={verifyCode}
                       required
+                      onKeyDown={handleKeyDown}
                       onChange={(e) => setVerifyCode(e.target.value)}
                     />
                     <div className="w-52 bg-transparent">

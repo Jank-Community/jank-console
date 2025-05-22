@@ -153,11 +153,9 @@ api.interceptors.response.use(
   (error: AxiosError<ErrorResponse>) => {
     // HTTP 错误处理
     const setError = useErrorStore.getState().setError
-    // if (error.response?.data.data == null) {
-    setError(error.response!.data.msg)
-    // } else {
-    // setError(error.response!.data.data)
-    // }
+    const errors = error.response!.data.msg.toString()
+    //INFO: 此处根据后端返回内容的异同而修改
+    setError(errors.split(':')[0])
     return Promise.reject(error)
   }
 )
