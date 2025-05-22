@@ -32,8 +32,7 @@ api.interceptors.request.use(
     }
     if (localStorage.getItem('refreshToken') && isToken) {
       //INFO: REFRESH_TOKEN是后端获取的key，如果token过期，后端有中间件获取此key，以刷新token
-      //WARN: 后端的refreshtoken暂未验证具体key名，但大概率是这个
-      config.headers.REFRESH_TOKEN = localStorage.getItem('refreshToken') // 让每个请求携带自定义token
+      config.headers['Refresh-Token'] = localStorage.getItem('refreshToken') // 让每个请求携带自定义token
     }
 
     const params = config.params || {}
