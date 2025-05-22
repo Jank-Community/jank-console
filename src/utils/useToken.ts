@@ -14,3 +14,8 @@ export const removeToken = () => {
 export const clearToken = () => {
   localStorage.clear()
 }
+
+export const getEmail = () => {
+  const email = localStorage.getItem('email')
+  return email
+}
