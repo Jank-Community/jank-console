@@ -24,11 +24,6 @@ export const useAuthStore = create<authStore>((set) => ({
   error: null,
   login: async (email: string, password: string, vercode: string) => {
     set({ isLoading: true, error: null })
-    // console.log('走到这里了')
-    // console.log('email', email)
-    // console.log('name', password)
-    // console.log('token', vercode)
-
     try {
       const res: AxiosResponse<{
         access_token: string
@@ -39,9 +34,6 @@ export const useAuthStore = create<authStore>((set) => ({
         password: password,
       })
 
-      // console.log('走到这里了2')
-      // console.log(res, 'res')
-      // console.log(res.data, 'res.data')
       const { access_token, refresh_token } = res.data
 
       set({
@@ -53,8 +45,7 @@ export const useAuthStore = create<authStore>((set) => ({
       // 在这里直接保存到 localStorage
       localStorage.setItem('token', access_token)
       localStorage.setItem('refreshToken', refresh_token)
-      // console.log('结束')
-      // console.log('结束')
+      localStorage.setItem('email', email)
 
       return true
     } catch (error: unknown) {
@@ -71,6 +62,7 @@ export const useAuthStore = create<authStore>((set) => ({
     set({ token: null, refreshToken: '' })
     localStorage.removeItem('token')
     localStorage.removeItem('refreshToken')
+    localStorage.removeItem('email')
     window.location.href = '/login'
   },
 }))

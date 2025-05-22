@@ -247,7 +247,11 @@ function Login() {
                       {verifyCodeImg === '' ? (
                         <span className="text-white">自动获取验证码</span>
                       ) : (
-                        <img src={verifyCodeImg} alt="验证码" />
+                        <img
+                          src={verifyCodeImg}
+                          alt="验证码"
+                          onClick={sendImgVerificationCode}
+                        />
                       )}
                     </div>
                   </div>
