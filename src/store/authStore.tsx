@@ -25,16 +25,18 @@ export const useAuthStore = create<authStore>((set) => ({
   login: async (email: string, password: string, vercode: string) => {
     set({ isLoading: true, error: null })
     try {
-      const res: AxiosResponse<{
-        access_token: string
-        refresh_token: string
-      }> = await api.post('/account/loginAccount', {
+      const res: AxiosResponse<
+        SuccessResponse<{
+          access_token: string
+          refresh_token: string
+        }>
+      > = await api.post('/account/loginAccount', {
         email: email,
         img_verification_code: vercode,
         password: password,
       })
 
-      const { access_token, refresh_token } = res.data
+      const { access_token, refresh_token } = res.data.data
 
       set({
         token: access_token,

@@ -7,14 +7,10 @@ import axios, {
 import qs from 'qs'
 
 import useErrorStore from './store/errorStore'
+import { parseErrorString } from './utils/parseErrString'
 
-const ignoreMsgs = ['无效的刷新令牌', '刷新令牌已过期']
-
-let requestList: any[] = []
-// 是否正在刷新中
-let isRefreshToken = false
 // 请求白名单，无须token的接口
-const whiteList: string[] = ['/api/v1/token', '/login', '/v1/publicKey']
+const whiteList: string[] = ['/login']
 // 所有通过api发送的请求，都会加上/api的前缀
 const api = axios.create({
   // baseURL: '/api',
@@ -33,6 +29,11 @@ api.interceptors.request.use(
     })
     if (localStorage.getItem('token') && isToken) {
       config.headers.Authorization = 'Bearer ' + localStorage.getItem('token') // 让每个请求携带自定义token
+    }
+    if (localStorage.getItem('refreshToken') && isToken) {
+      //INFO: REFRESH_TOKEN是后端获取的key，如果token过期，后端有中间件获取此key，以刷新token
+      //WARN: 后端的refreshtoken暂未验证具体key名，但大概率是这个
+      config.headers.REFRESH_TOKEN = localStorage.getItem('refreshToken') // 让每个请求携带自定义token
     }
 
     const params = config.params || {}
@@ -62,131 +63,40 @@ api.interceptors.request.use(
 
 // response 拦截器
 api.interceptors.response.use(
-  async (response: AxiosResponse<any>) => {
-    let { data, status } = response
-    if (status == 500) {
-      await handleError()
-      return Promise.reject('服务器异常！')
+  async (
+    response: AxiosResponse<SuccessResponse<any>>
+  ): Promise<AxiosResponse<SuccessResponse<any>>> => {
+    // 所有200的响应在此处处理
+    //如果token过期，后端通过refreshtoken重新返回token
+    //WARN: 此功能未经测试
+    if (response.headers['access_token']) {
+      console.log(response.headers['access_token'])
+      localStorage.setItem('token', response.headers['access_token'])
     }
-    const config = response.config
-    if (!data) {
-      throw new Error()
+    if (response.headers['refresh_token']) {
+      console.log(response.headers['refresh_token'])
+      localStorage.setItem('refreshToken', response.headers['refresh_token'])
     }
-    if (
-      response.request.responseType === 'blob' ||
-      response.request.responseType === 'arraybuffer'
-    ) {
-      if (response.data.type !== 'application/json') {
-        return response
-      }
-      data = await new Response(response.data).json()
-    }
-    const code = data.code
-    // 获取状态码描述信息
-    const msg = data.msg
-    if (ignoreMsgs.indexOf(msg) !== -1) {
-      // 如果是忽略的错误码，直接返回 msg 异常
-      return Promise.reject(msg)
-    } else if (code === 405) {
-      // 如果未认证，并且未进行刷新令牌，说明可能是访问令牌过期了
-      if (!isRefreshToken) {
-        isRefreshToken = true
-        // 1. 如果获取不到刷新令牌，则只能执行登出操作
-        if (!localStorage.getItem('refreshToken')) {
-          return handleAuthorized()
-        }
-        // 2. 进行刷新访问令牌
-        try {
-          const refreshTokenRes = await refreshToken()
-          if (refreshTokenRes.data.code == 200) {
-            // 2.1 刷新成功，则回放队列的请求 + 当前请求
-            localStorage.setItem('token', refreshTokenRes.data.data)
-            config.headers!.Authorization =
-              'Bearer ' + localStorage.getItem('token')
-            requestList.forEach((cb: any) => {
-              cb()
-            })
-            requestList = []
-            return api(config)
-          } else {
-            return handleAuthorized()
-          }
-        } catch (e) {
-          // 为什么需要 catch 异常呢？刷新失败时，请求因为 Promise.reject 触发异常。
-          // 2.2 刷新失败，只回放队列的请求
-          requestList.forEach((cb: any) => {
-            cb()
-          })
-          // 提示是否要登出。即不回放当前请求！不然会形成递归
-          return handleAuthorized()
-        } finally {
-          requestList = []
-          isRefreshToken = false
-        }
-      } else {
-        // 添加到队列，等待刷新获取到新的令牌
-        return new Promise((resolve) => {
-          requestList.push(() => {
-            config.headers!.Authorization =
-              'Bearer ' + localStorage.getItem('token')
-            resolve(api(config))
-          })
-        })
-      }
-    } else if (code === 500) {
-      return handleError()
-    } else if (code === 403) {
-      return handleForbidden()
-    } else if (code === 406) {
-      return handleAuthorized()
-    } else if (code === 401) {
-      if (!window.location.href.includes('login')) {
-        window.location.href = '/login'
-      }
-      localStorage.removeItem('token')
-      localStorage.removeItem('refreshToken')
-      return data
-    } else {
-      return data
-    }
+    return response
   },
+
+  // 非200响应，在以下处理
   (error: AxiosError<ErrorResponse>) => {
-    // HTTP 错误处理
+    //400响应可以直接使用msg
+    //
+    console.log(error)
+    const errorstr = parseErrorString(error.response!.data.msg.toString())
     const setError = useErrorStore.getState().setError
-    const errors = error.response!.data.msg.toString()
     //INFO: 此处根据后端返回内容的异同而修改
-    setError(errors.split(':')[0])
-    return Promise.reject(error)
+    if (error.response?.status == 400) {
+      setError(errorstr)
+      return Promise.reject(error)
+    }
+    if (error.response?.status == 500) {
+      setError(errorstr)
+      return Promise.reject(error)
+    }
   }
 )
-
-const refreshToken = async () => {
-  return await axios.get(
-    '/api/v1/token?refreshToken=' + localStorage.getItem('refreshToken')
-  )
-}
-
-const handleAuthorized = () => {
-  // 如果已经到重新登录页面则不进行弹窗提示
-  if (window.location.href.includes('login')) {
-    return
-  }
-  localStorage.removeItem('token')
-  localStorage.removeItem('refreshToken')
-  window.location.href = '/login'
-  return Promise.reject('认证失败')
-}
-
-const handleForbidden = () => {
-  const setError = useErrorStore.getState().setError
-  setError('未授权访问')
-  return Promise.reject(new Error('未授权访问'))
-}
-
-const handleError = () => {
-  const setError = useErrorStore.getState().setError
-  setError('服务器异常')
-  return Promise.reject(new Error('服务器异常'))
-}
 
 export default api

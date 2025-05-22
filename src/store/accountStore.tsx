@@ -25,14 +25,14 @@ export const useAccountStore = create<StoreState>((set) => ({
     set({ error: null })
     const email = getEmail()
     try {
-      const res: AxiosResponse<accountData> = await api.post(
+      const res: AxiosResponse<HttpResp<accountData>> = await api.post(
         '/account/getAccount',
         { email }
       )
       set({
-        account: res.data,
+        account: res.data.data,
       })
-      return res.data
+      return res.data.data
     } catch (error: any) {
       set({
         error: (error as AxiosError<ErrorResponse>).response!.data.msg,

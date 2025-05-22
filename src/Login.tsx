@@ -74,7 +74,7 @@ function Login() {
         '/verification/sendImgVerificationCode?' +
           parseQuery({ email: username })
       )
-      setVerifyCodeImg(res.data.imgBase64)
+      setVerifyCodeImg(res.data.data.imgBase64)
     } catch (error) {
       toast.error('获取验证码失败，请检查邮箱地址或网络。')
       setVerifyCodeImg('') // 清空验证码图片
