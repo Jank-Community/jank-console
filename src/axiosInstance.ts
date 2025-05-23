@@ -68,13 +68,16 @@ api.interceptors.response.use(
     // 所有200的响应在此处处理
     //如果token过期，后端通过refreshtoken重新返回token
     //WARN: 此功能未经测试
-    if (response.headers['access_token']) {
-      console.log(response.headers['access_token'])
-      localStorage.setItem('token', response.headers['access_token'])
+    const newAccessToken = response.headers['Authorization']?.replace(
+      'Bearer ',
+      ''
+    )
+    const newRefreshToken = response.headers['Refresh-Token']
+    if (newAccessToken) {
+      localStorage.setItem('token', newAccessToken)
     }
-    if (response.headers['refresh_token']) {
-      console.log(response.headers['refresh_token'])
-      localStorage.setItem('refreshToken', response.headers['refresh_token'])
+    if (newRefreshToken) {
+      localStorage.setItem('refreshToken', newRefreshToken)
     }
     return response
   },
@@ -95,6 +98,15 @@ api.interceptors.response.use(
       setError(errorstr)
       return Promise.reject(error)
     }
+    if (error.response?.status === 401) {
+      // 如果是 401 错误，有三种可能：1. 缺少 Authorization 请求头 2. 双 Token 解析失败或过期
+      // 清除本地的 token 并跳转到登录页
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      window.location.href = '/login'
+      setError(errorstr)
+    }
+    return Promise.reject(error)
   }
 )
 
