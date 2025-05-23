@@ -4,6 +4,8 @@
  * @returns Record<string, string | number> （自动转换数字字符串为 number）
  */
 
+//TODO: 修改返回格式，因为token过期时的状态码是后端msg中返回的
+
 export const parseErrorString = (str: string): string => {
   if (!str.includes('code=')) {
     const result = str.split(':')[0]
