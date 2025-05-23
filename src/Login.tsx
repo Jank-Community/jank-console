@@ -245,7 +245,7 @@ function Login() {
                     />
                     <div className="w-52 bg-transparent">
                       {verifyCodeImg === '' ? (
-                        <span className="text-white">自动获取验证码</span>
+                        <span>自动获取验证码</span>
                       ) : (
                         <img
                           src={verifyCodeImg}
