@@ -1,6 +1,8 @@
 import { AxiosError, AxiosResponse } from 'axios'
 import { create } from 'zustand'
 
+import { clearToken } from '@/utils/useToken'
+
 // 引入 Axios 实例
 import api from '../axiosInstance'
 
@@ -62,9 +64,7 @@ export const useAuthStore = create<authStore>((set) => ({
   },
   logout: () => {
     set({ token: null, refreshToken: '' })
-    localStorage.removeItem('token')
-    localStorage.removeItem('refreshToken')
-    localStorage.removeItem('email')
+    clearToken()
     window.location.href = '/login'
   },
 }))

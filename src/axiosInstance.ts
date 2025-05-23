@@ -1,3 +1,5 @@
+import { Router } from 'react-router-dom'
+
 import axios, {
   AxiosError,
   AxiosRequestHeaders,
@@ -5,9 +7,11 @@ import axios, {
   InternalAxiosRequestConfig,
 } from 'axios'
 import qs from 'qs'
+import { toast } from 'sonner'
 
 import useErrorStore from './store/errorStore'
 import { parseErrorString } from './utils/parseErrString'
+import { clearToken, removeToken } from './utils/useToken'
 
 // 请求白名单，无须token的接口
 const whiteList: string[] = ['/login']
@@ -85,26 +89,23 @@ api.interceptors.response.use(
   // 非200响应，在以下处理
   (error: AxiosError<ErrorResponse>) => {
     //400响应可以直接使用msg
-    //
-    console.log(error)
-    const errorstr = parseErrorString(error.response!.data.msg.toString())
+    const errorObj = parseErrorString<errRes>(
+      error.response!.data.msg.toString()
+    )
     const setError = useErrorStore.getState().setError
     //INFO: 此处根据后端返回内容的异同而修改
     if (error.response?.status == 400) {
-      setError(errorstr)
+      setError(errorObj.message)
       return Promise.reject(error)
     }
     if (error.response?.status == 500) {
-      setError(errorstr)
+      setError(errorObj.message)
+      if (errorObj.code === 401) {
+        toast.error(errorObj.message)
+        clearToken()
+        window.location.href = '/login'
+      }
       return Promise.reject(error)
-    }
-    if (error.response?.status === 401) {
-      // 如果是 401 错误，有三种可能：1. 缺少 Authorization 请求头 2. 双 Token 解析失败或过期
-      // 清除本地的 token 并跳转到登录页
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('refresh_token')
-      window.location.href = '/login'
-      setError(errorstr)
     }
     return Promise.reject(error)
   }

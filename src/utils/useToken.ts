@@ -12,7 +12,9 @@ export const removeToken = () => {
 }
 
 export const clearToken = () => {
-  localStorage.clear()
+  localStorage.removeItem('token')
+  localStorage.removeItem('refreshToken')
+  localStorage.removeItem('email')
 }
 
 export const getEmail = () => {
