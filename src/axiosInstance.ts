@@ -1,5 +1,3 @@
-import { Router } from 'react-router-dom'
-
 import axios, {
   AxiosError,
   AxiosRequestHeaders,
@@ -11,7 +9,7 @@ import { toast } from 'sonner'
 
 import useErrorStore from './store/errorStore'
 import { parseErrorString } from './utils/parseErrString'
-import { clearToken, removeToken } from './utils/useToken'
+import { clearToken } from './utils/useToken'
 
 // 请求白名单，无须token的接口
 const whiteList: string[] = ['/login']
@@ -71,7 +69,6 @@ api.interceptors.response.use(
   ): Promise<AxiosResponse<SuccessResponse<any>>> => {
     // 所有200的响应在此处处理
     //如果token过期，后端通过refreshtoken重新返回token
-    //WARN: 此功能未经测试
     const newAccessToken = response.headers['Authorization']?.replace(
       'Bearer ',
       ''
