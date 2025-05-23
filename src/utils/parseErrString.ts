@@ -4,10 +4,8 @@
  * @returns Record<string, string | number> （自动转换数字字符串为 number）
  */
 
-export const parseErrorString = (
-  str: string
-): Record<string, string | number> | string => {
-  if (!str.includes('=')) {
+export const parseErrorString = (str: string): string => {
+  if (!str.includes('code=')) {
     const result = str.split(':')[0]
     return result
   } else {
@@ -31,6 +29,6 @@ export const parseErrorString = (
       throw new Error('No valid key-value pairs found')
     }
 
-    return result
+    return result.message as string
   }
 }
