@@ -54,11 +54,7 @@ export function NavUser({ user, logout }: { user: accountData; logout: any }) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage
-                  //INFO: 暂时不提供头像
-                  // src={'data:image/png;base64,' + user.avatar}
-                  alt={user.nickname}
-                />
+                <AvatarImage src={'/favicon.svg'} alt={user.nickname} />
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">

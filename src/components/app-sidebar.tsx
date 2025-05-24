@@ -18,7 +18,6 @@ import {
   SquareTerminal,
   UserRoundCog,
 } from 'lucide-react'
-import { v4 as uuidv4 } from 'uuid'
 
 import { NavMain } from '@/components/nav-main'
 import { NavSecondary } from '@/components/nav-secondary'
@@ -36,8 +35,6 @@ import {
 } from '@/components/ui/sidebar'
 import { useAccountStore } from '@/store/accountStore'
 import { useAuthStore } from '@/store/authStore'
-import useSystemStore from '@/store/systemStore'
-import { useVisitorStore } from '@/store/visitorStore'
 
 const data = {
   navMain: [
@@ -156,19 +153,8 @@ const data = {
   ],
 }
 
-// 检查或生成用户唯一标识符
-function getOrCreateUUID() {
-  let userUUID = localStorage.getItem('userUUID')
-  if (!userUUID) {
-    userUUID = uuidv4() // 生成新的 UUID
-    localStorage.setItem('userUUID', userUUID) // 存储在 localStorage
-  }
-  return userUUID
-}
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { account, getAccount } = useAccountStore()
-  const { queryDepartment } = useSystemStore()
   const { logout } = useAuthStore()
   useEffect(() => {
     getAccount()
