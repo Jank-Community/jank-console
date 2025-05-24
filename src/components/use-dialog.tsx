@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 
-export function useDialog(form: any) {
+export function useDialog<T extends HTMLElement = HTMLElement>(form: any) {
   const [isOpen, setIsOpen] = useState(false)
-  const triggerRef = React.useRef<HTMLDivElement>(null)
+  const triggerRef = React.useRef<T>(null)
 
   function trigger() {
     setIsOpen(true)
@@ -30,4 +30,3 @@ export function useDialog(form: any) {
     dismiss,
   }
 }
-

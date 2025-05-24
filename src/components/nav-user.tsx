@@ -40,10 +40,10 @@ import { logoImg } from '@/utils'
 
 export function NavUser({ user, logout }: { user: accountData; logout: any }) {
   const { isMobile } = useSidebar()
-  const aboutDialog = useDialog(null)
+  const aboutDialog = useDialog<HTMLDivElement>(null)
   const navigate = useNavigate()
 
-  const supportDialog = useDialog(null)
+  const supportDialog = useDialog<HTMLDivElement>(null)
   return (
     <SidebarMenu>
       <SidebarMenuItem>
